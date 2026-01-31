@@ -63,9 +63,8 @@ El modelo del sistema fue representado mediante un **diagrama de clases UML**, d
 - Relaciones entre las clases principales.
 - Uso de un `enum` para representar las monedas.
 
-El diagrama se encuentra incluido en el repositorio.
+![Diagrama de clases](docs/DiagramaClasesAlkeWallet.png)
 
----
 
 ## Pruebas unitarias
 
