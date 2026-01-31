@@ -1,6 +1,6 @@
 package alkewallet;
 
-public class Conversor {
+public class Conversor implements IConversor {
 
     public double obtenerTasa(Moneda origen, Moneda destino) {
 
@@ -19,7 +19,8 @@ public class Conversor {
         return 1.0;
     }
 
-    public double convertir(double monto, Moneda origen, Moneda destino) {
+    @Override
+        public double convertir(double monto, Moneda origen, Moneda destino) {
         double tasa = obtenerTasa(origen, destino);
         return monto * tasa;
     }
