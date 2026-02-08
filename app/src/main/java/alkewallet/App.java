@@ -2,6 +2,10 @@ package alkewallet;
 
 import java.util.Scanner;
 
+import alkewallet.model.Cuenta;
+import alkewallet.model.Moneda;
+import alkewallet.services.Conversor;
+
 public class App {
 
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package alkewallet;
+package alkewallet.model;
 
 public enum Moneda {
     CLP,

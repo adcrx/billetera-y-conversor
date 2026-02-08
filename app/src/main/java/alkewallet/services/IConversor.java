@@ -1,4 +1,6 @@
-package alkewallet;
+package alkewallet.services;
+
+import alkewallet.model.Moneda;
 
 public interface IConversor {
 

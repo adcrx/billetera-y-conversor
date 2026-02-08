@@ -1,4 +1,4 @@
-package alkewallet;
+package alkewallet.model;
 
 import org.junit.jupiter.api.Test;
 

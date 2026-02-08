@@ -1,6 +1,9 @@
-package alkewallet;
+package alkewallet.services;
 
 import org.junit.jupiter.api.Test;
+
+import alkewallet.model.Moneda;
+import alkewallet.services.ConversorTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 

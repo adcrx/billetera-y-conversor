@@ -1,5 +1,5 @@
 
-package alkewallet;
+package alkewallet.model;
 
 public class Cuenta {
 
