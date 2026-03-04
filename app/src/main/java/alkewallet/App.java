@@ -2,9 +2,7 @@ package alkewallet;
 
 import java.util.Scanner;
 
-import alkewallet.model.Cuenta;
-import alkewallet.model.Moneda;
-import alkewallet.services.Conversor;
+import alkewallet.model.Wallet;
 
 public class App {
 
@@ -12,104 +10,171 @@ public class App {
 
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("~~~~ALKE WALLET~~~~");
-        System.out.print("Ingrese su nombre: ");
-        String nombreUsuario = scanner.nextLine();
-        Cuenta cuenta = new Cuenta();
-        boolean salir = false;
+        System.out.println("================================");
+        System.out.println("   BIENVENIDO A ALKE WALLET   ");
+        System.out.println("================================");
 
-        while (!salir) {
-            mostrarMenu();
-            int opcion = obtenerOpcion(scanner);
+        String nombre = "";
+
+        while (nombre.isEmpty()) {
+            System.out.print("\nIngresa tu nombre: ");
+            nombre = scanner.nextLine().trim();
+
+            if (nombre.isEmpty()) {
+                System.out.println(" El nombre no puede estar vacío. Por favor, ingrese su nombre");
+            }
+        }
+
+        System.out.println("Hola " + nombre);
+
+        String moneda = "";
+        while (!moneda.equals("CLP") && !moneda.equals("USD") && !moneda.equals("EUR")) {
+            System.out.print("\nIngresa la moneda en que desea que esté su cuenta (CLP, USD, EUR): ");
+            moneda = scanner.nextLine().toUpperCase().trim();
+
+            if (!moneda.equals("CLP") && !moneda.equals("USD") && !moneda.equals("EUR")) {
+                System.out.println(" Moneda inválida. Las opciones son: CLP, USD, EUR");
+            }
+        }
+
+        Wallet miWallet = new Wallet(nombre, moneda);
+        System.out.println("\n¡CUENTA CREADA EXITOSAMENTE!");
+        System.out.println("   Titular: " + nombre);
+        System.out.println("   Moneda: " + moneda);
+        System.out.println("   Saldo inicial: $" + miWallet.consultarSaldo() + " " + moneda);
+
+        int opcion;
+        do {
+            System.out.println("\n═════════════════════════════");
+            System.out.println("          MENÚ PRINCIPAL     ");
+            System.out.println("═════════════════════════════");
+            System.out.println("1.  Depositar dinero");
+            System.out.println("2.  Retirar dinero");
+            System.out.println("3.  Consultar saldo");
+            System.out.println("4.  Convertir moneda");
+            System.out.println("0.  Salir");
+            System.out.print("Selecciona una opción: ");
+
+            while (!scanner.hasNextInt()) {
+                System.out.println("Error: El número que ingresaste no corresponde a ninguna opción");
+                scanner.next();
+                System.out.print("Selecciona una opción: ");
+            }
+            opcion = scanner.nextInt();
+            scanner.nextLine();
 
             switch (opcion) {
                 case 1:
-                    System.out.println("Saldo actual: $" + cuenta.getSaldo() + " " + cuenta.getMoneda());
+                    System.out.print("Ingrese el monto a depositar:");
+                    double montoDeposito;
+
+                    while (true) {
+                        while (!scanner.hasNextDouble()) {
+                            System.out.println(" Debes ingresar un monto válido. Ejemplo: 5000");
+                            scanner.next();
+                            System.out.print(" Ingresa el monto a depositar: ");
+                        }
+
+                        montoDeposito = scanner.nextDouble();
+                        scanner.nextLine();
+
+                        if (montoDeposito > 0) {
+                            break;
+                        } else {
+                            System.out.println(" El monto debe ser mayor que cero. Intenta de nuevo.");
+                            System.out.print(" Ingresa el monto a depositar: ");
+                        }
+                    }
+
+                    miWallet.depositar(montoDeposito);
+
                     break;
                 case 2:
-                    System.out.print("Ingrese monto a ingresar: ");
-                    double montoIngreso = obtenerMonto(scanner);
-                    cuenta.ingresarDinero(montoIngreso);
-                    System.out.println("Saldo actual: $" + cuenta.getSaldo());
-                    break;
-                case 3:
-                    System.out.print("Ingrese monto a retirar: ");
-                    double montoRetiro = obtenerMonto(scanner);
-                    boolean retiroExitoso = cuenta.retirarDinero(montoRetiro);
+                    double montoRetiro;
+                    boolean retiroExitoso = false;
 
-                    if (retiroExitoso) {
-                     System.out.println("Retiro realizado con éxito.");
-                     System.out.println("Saldo actual: $" + cuenta.getSaldo());
-                    } else {
-                     System.out.println("No se pudo realizar el retiro.");
-                     System.out.println("El monto ingresado excede el máximo de su saldo.");
+                    while (!retiroExitoso) {
+                        System.out.print("Ingrese el monto a retirar: ");
+
+                        while (!scanner.hasNextDouble()) {
+                            System.out.println(" Debes ingresar un monto válido. Ejemplo: 5000");
+                            scanner.next();
+                            System.out.print(" Ingresa el monto a retirar: ");
+                        }
+
+                        montoRetiro = scanner.nextDouble();
+                        scanner.nextLine();
+
+                        if (montoRetiro <= 0) {
+                            System.out.println(" El monto debe ser mayor que cero. Intenta de nuevo.");
+                            continue;
+                        }
+
+                        if (montoRetiro > miWallet.consultarSaldo()) {
+                            System.out.println(" No tienes suficiente saldo.");
+                            System.out.println(" Saldo disponible: $" + miWallet.consultarSaldo() + " " + moneda);
+                            continue;
+                        }
+
+                        miWallet.retirar(montoRetiro);
+                        retiroExitoso = true;
                     }
                     break;
-               case 4:
-                    System.out.println("Moneda actual: " + cuenta.getMoneda());
-                    System.out.print("Ingrese moneda destino (CLP/USD/EUR): ");
-                    Moneda monedaDestino = obtenerMoneda(scanner);
 
-                    Conversor conversor = new Conversor();
-                    double saldoConvertido = conversor.convertir(cuenta.getSaldo(), cuenta.getMoneda(), monedaDestino);
+                case 3:
 
-                    cuenta.cambiarMoneda(monedaDestino, saldoConvertido);
+                    System.out.println("Su saldo es: " + miWallet.consultarSaldo() + moneda);
 
-                    System.out.println("Conversión realizada.");
-                    System.out.println("Saldo actual: $" + cuenta.getSaldo() + " " + cuenta.getMoneda());
-                     break;
-                case 5:
-                    System.out.println("¡Hasta luego, " + nombreUsuario + "!");
-                    salir = true;
                     break;
-                default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
+
+                case 4:
+                    double saldoActual = miWallet.consultarSaldo();
+                    System.out.println("Su saldo es: $" + saldoActual + " " + moneda);
+
+                    while (true) {
+                        System.out
+                                .println("Ingrese el monto a convertir. Si desea convertir el total, presione ENTER.");
+                        System.out.print("Ingrese el monto a convertir (o ENTER para todo): ");
+
+                        String entradaMonto = scanner.nextLine().trim();
+                        double montoConvertir;
+
+                        if (entradaMonto.isEmpty()) {
+                            montoConvertir = saldoActual;
+                            System.out.println("Convertirá TODO su saldo: $" + montoConvertir + " " + moneda);
+                        } else {
+                            try {
+                                montoConvertir = Double.parseDouble(entradaMonto);
+                            } catch (NumberFormatException e) {
+                                System.out.println("Error: Debes ingresar un número válido");
+                                continue;
+                            }
+                            if (montoConvertir <= 0) {
+                                System.out.println("El monto debe ser mayor que cero.");
+                                continue;
+                            }
+                            if (montoConvertir > saldoActual) {
+                                System.out.println(
+                                        "No tienes suficiente saldo. Disponible: $" + saldoActual + " " + moneda);
+                                continue;
+                            }
+                        }
+                        System.out.print("Ingresa la moneda destino (USD, EUR): ");
+                        String destino = scanner.nextLine().toUpperCase();
+
+                        double resultado = miWallet.convertir(montoConvertir, destino);
+
+                        if (resultado != -1.0) {
+                            System.out.println("Conversión exitosa!");
+                            break;
+                        }
+
+                    }
                     break;
             }
-        }
 
+        }
+        while (opcion != 0);
         scanner.close();
-    }
 
-    public static void mostrarMenu() {
-        System.out.println("\n----- MENÚ -----");
-        System.out.println("1. Ver saldo");
-        System.out.println("2. Ingresar dinero");
-        System.out.println("3. Retirar dinero");
-        System.out.println("4. Convertir moneda");
-        System.out.println("5. Salir");
-        System.out.print("Seleccione una opción: ");
-    }
-
-    public static int obtenerOpcion(Scanner scanner) {
-        while (!scanner.hasNextInt()) {
-            System.out.print("Por favor, ingrese un número válido: ");
-            scanner.next();
-        }
-        int opcion = scanner.nextInt();
-        scanner.nextLine();
-        return opcion;
-    }
-
-    public static double obtenerMonto(Scanner scanner) {
-        while (!scanner.hasNextDouble()) {
-            System.out.print("Por favor, ingrese un monto válido: ");
-            scanner.next();
-        }
-        double monto = scanner.nextDouble();
-        scanner.nextLine();
-        return monto;
-    }
-
-    public static Moneda obtenerMoneda(Scanner scanner) {
-    while (true) {
-        String texto = scanner.nextLine().trim().toUpperCase();
-
-        try {
-            return Moneda.valueOf(texto);
-        } catch (IllegalArgumentException e) {
-            System.out.print("Moneda inválida. Ingrese CLP, USD o EUR: ");
-            }
-          }
-    }
-}
+}}

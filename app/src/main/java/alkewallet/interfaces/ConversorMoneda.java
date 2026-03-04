@@ -3,9 +3,7 @@ package alkewallet.interfaces;
 public interface ConversorMoneda {
 
 
-} ConversorMoneda {
+  double convertir(double monto, String monedaDestino);
 
-  convertir(double monto, String monedaDestino);
-
-  obtenerTipoCambio(String moneda);
+  double obtenerTipoCambio(String moneda);
 }

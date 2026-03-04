@@ -17,8 +17,21 @@ public class Wallet implements ConversorMoneda, OperacionesCuenta {
     this.moneda = moneda;
     this.saldo = 0.0;
     this.tiposCambio = new HashMap<>();
-  }
 
+    if (moneda.equals("CLP")) {
+      this.tiposCambio.put("USD", 950.0);
+      this.tiposCambio.put("EUR", 1050.0);
+      this.tiposCambio.put("CLP", 1.0);
+    } else if (moneda.equals("USD")) {
+      this.tiposCambio.put("CLP", 0.0011);
+      this.tiposCambio.put("EUR", 0.85);
+      this.tiposCambio.put("USD", 1.0);
+    } else if (moneda.equals("EUR")) {
+      this.tiposCambio.put("CLP", 0.00095);
+      this.tiposCambio.put("USD", 1.18);
+      this.tiposCambio.put("EUR", 1.0);
+    }
+  }
 
   @Override
 
@@ -26,16 +39,16 @@ public class Wallet implements ConversorMoneda, OperacionesCuenta {
     if (monto <= 0) {
       System.out.println("Error: El monto a depositar debe ser mayor que cero.");
       return;
+    }
 
       this.saldo = this.saldo + monto;
 
       System.out.println("Monto depositado: " + monto);
       System.out.println("Su nuevo saldo es: " + this.saldo);
-    }
+
   }
 
   public double consultarSaldo() {
-    System.out.println("Su saldo es: " + this.saldo + " " + this.moneda);
     return this.saldo;
   }
 
@@ -60,25 +73,25 @@ public class Wallet implements ConversorMoneda, OperacionesCuenta {
     if (moneda == null || moneda.trim().isEmpty()) {
       System.out.println("Debes especificar una moneda");
       return -1.0;
+    }
 
     moneda = moneda.toUpperCase();
 
-    if(!this.tiposCambio.containsKey(moneda)){
+    if (!this.tiposCambio.containsKey(moneda)) {
       System.out.println("No tenemos tipo de cambio para: " + moneda);
       System.out.println("Monedas disponibles para convertir: " + this.tiposCambio.keySet());
       return -1.0;
     }
 
     double tiposCambio = this.tiposCambio.get(moneda);
-
-
+    return tiposCambio;
   }
 
   public double convertir(double monto, String monedaDestino) {
     if (monto <= 0) {
       System.out.println("El monto ingresado debe ser mayor que cero.");
     }
-    if (monto < this.saldo) {
+    if (monto > this.saldo) {
       System.out.println("El monto ingresado debe ser menor o igual a su saldo");
       System.out.println("Usted ingresó: " + this.saldo + this.moneda);
       return -1.0;
@@ -92,7 +105,11 @@ public class Wallet implements ConversorMoneda, OperacionesCuenta {
 
     double tipoCambio = obtenerTipoCambio(monedaDestino);
 
-    if (monedaDestino.equals(monedaDestino)) {
+  if (tipoCambio == -1.0) {
+    return -1.0;
+  }
+
+    if (monedaDestino.equals(this.moneda)) {
       System.out.println("Elija un tipo de moneda diferente al tipo de moneda actual.");
       return -1.0;
     }
